@@ -1,0 +1,133 @@
+jsp分页模板:
+<div>
+                <table width="100%" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <ul class="pagination">
+                            <li class="<c:if test="${paging.currentPage<1}">disabled</c:if>"><a
+                                    href='javascript:;' data-page-num=1>第一页</a>
+                            </li>
+                            <c:choose>
+                                <c:when test="${paging.hasPreviousPage==true}">
+                                    <li><a href='javascript:;' data-page-num=${paging.currentPage-1}>上一页</a></li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li class="disabled">
+                                        <a href='javascript:;' data-page-num=1>上一页</a>
+                                    </li>
+                                </c:otherwise>
+                            </c:choose>
+                            <c:if test="${paging.currentPage>1}">
+                                <c:choose>
+                                    <c:when test="${paging.currentPage-3>=2}">
+                                        <c:set value="${paging.currentPage-3}" var="forwardFirstPage" scope="request"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set value="1" var="forwardFirstPage"  scope="request"/>
+                                    </c:otherwise>
+                                </c:choose>
+                                <c:forEach begin="${requestScope.forwardFirstPage}" end="${paging.currentPage-1 }" var="forwardPageNum">
+                                    <li>
+                                        <a href='javascript:;' data-page-num=${forwardPageNum}>${forwardPageNum}</a>
+                                    </li>
+                                </c:forEach>
+                            </c:if>
+                            <li class="active"><a href='javascript:;' data-page-num=${paging.currentPage}>${paging.currentPage}</a></li>
+                            <c:if test="${paging.currentPage<paging.totalPages}">
+                                <c:choose>
+                                    <c:when test="${paging.currentPage+4 <= paging.totalPages}">
+                                        <c:set value="${paging.currentPage+4}" var="backwardFirstPage" scope="request"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set value="${paging.totalPages}" var="backwardFirstPage" scope="request" />
+                                    </c:otherwise>
+                                </c:choose>
+                                <c:forEach begin="${paging.currentPage+1}" end="${requestScope.backwardFirstPage }" var="backwardPageNum">
+                                    <li>
+                                        <a href='javascript:;' data-page-num=${backwardPageNum}>${backwardPageNum}</a>
+                                    </li>
+                                </c:forEach>
+                            </c:if>
+                            <c:choose>
+                                <c:when test="${paging.hasNextPage==true}">
+                                    <li><a href='javascript:;' data-page-num=${paging.currentPage+1}>下一页</a></li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li class="disabled">
+                                        <a href='javascript:;' data-page-num=${paging.totalPages}>下一页</a>
+                                    </li>
+                                </c:otherwise>
+                            </c:choose>
+                            <li class="<c:if test="${paging.currentPage==paging.totalPages}">disabled</c:if>"><a href='javascript:;'
+                                                                                   data-page-num=${paging.totalPages}>末页</a>
+                            </li>
+                        </ul>
+                    </tr>
+                </table>
+            </div>
+
+-----------------------------------------------------------------------------
+
+FreeMarker分页模板:
+
+
+<div class="row">
+                    <#if page.items?has_content>
+                        <ul class="pagination">
+                            <li class="<#if !page.hasFirstPage()>disabled</#if>"><a
+                                    href='javascript:;' data-page-num=1>第一页</a>
+                            </li>
+                            <#if page.hasPrePage()>
+                                <li><a href='javascript:;' data-page-num=${(page.pageNum-1)?c}>上一页</a></li>
+                            <#else>
+                                <li class="disabled">
+                                    <a href='javascript:;' data-page-num=1>上一页</a>
+                                </li>
+                            </#if>
+
+                            <#if (page.pageNum > 1)>
+                                <#if (page.pageNum-3 >= 2)>
+                                    <#assign forwardFirstPage=(page.pageNum-3)>
+                                <#else>
+                                    <#assign forwardFirstPage=1>
+                                </#if>
+
+                                <#list forwardFirstPage..(page.pageNum-1) as forwardPageNum>
+                                    <li>
+                                        <a href='javascript:;' data-page-num=${forwardPageNum?c}>${forwardPageNum?c}</a>
+                                    </li>
+                                </#list>
+                            </#if>
+                            <li class="active"><a href='javascript:;' data-page-num=${page.pageNum?c}>${page
+                            .pageNum?c}</a></li>
+
+                            <#if (page.pageNum < page.getPages())>
+                                <#if (page.pageNum+4 <= page.getPages())>
+                                    <#assign backwardFirstPage=(page.pageNum+4)>
+                                <#else>
+                                    <#assign backwardFirstPage=page.getPages()>
+                                </#if>
+
+                                <#list (page.pageNum + 1)..backwardFirstPage as backwardPageNum>
+                                    <li>
+                                        <a href='javascript:;' data-page-num=${backwardPageNum?c}>${backwardPageNum?c}</a>
+                                    </li>
+                                </#list>
+                            </#if>
+                            <#if page.hasNextPage()>
+                                <li><a href='javascript:;' data-page-num=${(page.pageNum+1)?c}>下一页</a></li>
+                            <#else >
+                                <li class="disabled"><a href='javascript:;' data-page-num=${(page.getPages())?c}>下一页</a></li>
+                            </#if>
+                            <li class="<#if !page.hasLastPage()>disabled</#if>"><a href='javascript:;'
+                                                                                   data-page-num=${(page.getPages())?c}>末页</a>
+                            </li>
+                        </ul>
+                    </#if>
+                    </div>
+
+
+js:
+   $('.pagination a').bind('click', function () {
+        $('#filter input:hidden[name="pageNum"]').val($(this).attr('data-page-num'));
+
+   });
